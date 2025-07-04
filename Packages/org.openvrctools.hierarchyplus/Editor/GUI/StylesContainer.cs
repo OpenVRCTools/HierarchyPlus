@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace OpenVRCTools.HierarchyPlus
@@ -8,11 +6,21 @@ namespace OpenVRCTools.HierarchyPlus
 	internal class StylesContainer
 	{
 		internal static StylesContainer _styles;
-		internal static StylesContainer Styles => _styles ?? (_styles = new StylesContainer());
-		
+		internal static StylesContainer Styles => _styles ??= new StylesContainer();
+
 		internal readonly GUIStyle
-			labelButton = new GUIStyle(GUI.skin.label) {padding = new RectOffset(), margin = new RectOffset(1, 1, 1, 1)},
-			faintLabel = new GUIStyle(GUI.skin.label) {fontStyle = FontStyle.Italic, richText = true, fontSize = 11, normal = {textColor = EditorGUIUtility.isProSkin ? Color.gray : new Color(0.357f, 0.357f, 0.357f)}},
+			labelButton = new GUIStyle(GUI.skin.label)
+			{
+				padding = new RectOffset(),
+				margin = new RectOffset(1, 1, 1, 1)
+			},
+			faintLabel = new GUIStyle(GUI.skin.label)
+			{
+				fontStyle = FontStyle.Italic,
+				richText = true,
+				fontSize = 11,
+				normal = { textColor = EditorGUIUtility.isProSkin ? Color.gray : new Color(0.357f, 0.357f, 0.357f) }
+			},
 			assetLabel = "AssetLabel",
 			bigTitle = "in bigtitle",
 			faintLinkLabel;

@@ -16,16 +16,13 @@ namespace OpenVRCTools.HierarchyPlus
 	internal class SavedSettings
 	{
 		internal static SavedSettings settings => data;
-
 		private const string PrefsKey = "HierarchyPlusSettingsJSON";
 
 		#region Main
-
 		private static bool saveDisabled;
 		private static bool _pendingSave;
 		private static bool _savePaused;
 		private static SavedSettings _data;
-
 		internal static bool savePaused
 		{
 			get => _savePaused;
@@ -34,32 +31,32 @@ namespace OpenVRCTools.HierarchyPlus
 				bool wasPaused = _savePaused;
 				_savePaused = value;
 
-				if (wasPaused && !_savePaused && _pendingSave) Save();
+				if (wasPaused && !_savePaused && _pendingSave)
+					Save();
 			}
 		}
-
 		internal static Action onClear;
-
 		internal static SavedSettings data
 		{
 			get
 			{
-				if (_data == null) Load();
+				if (_data == null)
+					Load();
+
 				return _data;
 			}
 		}
 
-
 		#region Methods
-
 		internal static void Save()
 		{
 			_pendingSave = false;
-			if (savePaused) _pendingSave = true;
+
+			if (savePaused)
+				_pendingSave = true;
 			else if (!saveDisabled)
 			{
 				StringBuilder dataBuilder = new StringBuilder($"MAIN[{JsonUtility.ToJson(data)}]\u200B\u200B\u200B");
-
 				string rawData = dataBuilder.ToString();
 				string compressedData = CompressString(rawData);
 				EditorPrefs.SetString(PrefsKey, compressedData);
@@ -72,6 +69,7 @@ namespace OpenVRCTools.HierarchyPlus
 			{
 				string fullData = string.Empty;
 				fullData = EditorPrefs.GetString(PrefsKey, string.Empty);
+
 				if (!string.IsNullOrWhiteSpace(fullData))
 					fullData = DecompressString(fullData);
 
@@ -80,6 +78,7 @@ namespace OpenVRCTools.HierarchyPlus
 				if (!string.IsNullOrEmpty(fullData))
 				{
 					var matches = Regex.Matches(fullData, @"(\w+)\[(.*?)\]\u200B\u200B\u200B");
+
 					for (int i = 0; i < matches.Count; i++)
 					{
 						var m = matches[i];
@@ -88,11 +87,9 @@ namespace OpenVRCTools.HierarchyPlus
 				}
 
 				if (dataDictionary.TryGetValue("MAIN", out string mainJson))
-				{
 					_data = JsonUtility.FromJson<SavedSettings>(mainJson);
-				}
 
-				if (_data == null) _data = new SavedSettings();
+				_data ??= new SavedSettings();
 			}
 			catch (Exception ex)
 			{
@@ -103,7 +100,8 @@ namespace OpenVRCTools.HierarchyPlus
 
 		internal static void AskClear()
 		{
-			if (EditorUtility.DisplayDialog("Clearing Settings", "Are you sure you want to clear the settings?", "Clear", "Cancel")) Clear();
+			if (EditorUtility.DisplayDialog("Clearing Settings", "Are you sure you want to clear the settings?", "Clear", "Cancel"))
+				Clear();
 		}
 
 		internal static void Clear()
@@ -118,9 +116,7 @@ namespace OpenVRCTools.HierarchyPlus
 			byte[] buffer = Encoding.UTF8.GetBytes(text);
 			var memoryStream = new MemoryStream();
 			using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, true))
-			{
 				gZipStream.Write(buffer, 0, buffer.Length);
-			}
 
 			memoryStream.Position = 0;
 
@@ -145,14 +141,11 @@ namespace OpenVRCTools.HierarchyPlus
 
 				memoryStream.Position = 0;
 				using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
-				{
 					gZipStream.Read(buffer, 0, buffer.Length);
-				}
 
 				return Encoding.UTF8.GetString(buffer);
 			}
 		}
-
 		#endregion
 
 		internal class SaveOnChange : IDisposable
@@ -174,6 +167,7 @@ namespace OpenVRCTools.HierarchyPlus
 			{
 				bool hasChanged = changeScope.changed;
 				changeScope.Dispose();
+
 				if (hasChanged)
 				{
 					OnChange?.Invoke();
@@ -183,7 +177,8 @@ namespace OpenVRCTools.HierarchyPlus
 				savePaused = wasPaused;
 			}
 
-			public static implicit operator bool(SaveOnChange soc) => soc.changeScope.changed;
+			public static implicit operator bool(SaveOnChange soc) =>
+				soc.changeScope.changed;
 		}
 
 		internal class SavePauseScope : IDisposable
@@ -196,16 +191,12 @@ namespace OpenVRCTools.HierarchyPlus
 				savePaused = true;
 			}
 
-			public void Dispose()
-			{
+			public void Dispose() =>
 				savePaused = wasPaused;
-			}
 		}
-
 		#endregion
 
 		#region Classes
-
 		[Serializable]
 		internal class SavedBool : SavedValue
 		{
@@ -231,48 +222,59 @@ namespace OpenVRCTools.HierarchyPlus
 				OnChanged = OnChangedCallback;
 			}
 
-			internal void Toggle() => value = !_value;
+			internal void Toggle() =>
+				value = !_value;
 
-			internal void DrawField(string label, GUIStyle style = null, params GUILayoutOption[] options)
-				=> DrawField(new GUIContent(label), style, options);
-
+			internal void DrawField(string label, GUIStyle style = null, params GUILayoutOption[] options) =>
+				DrawField(new GUIContent(label), style, options);
 
 			internal void DrawField(GUIContent label, GUIStyle style = null, params GUILayoutOption[] options)
 			{
-				if (style == null) value = EditorGUILayout.Toggle(label, value, options);
-				else value = EditorGUILayout.Toggle(label, value, style, options);
+				value = style == null
+					? EditorGUILayout.Toggle(label, value, options)
+					: EditorGUILayout.Toggle(label, value, style, options);
 			}
 
-			internal void DrawToggle(string activeLabel, string inactiveLabel = null, GUIStyle style = null, Color? activeColor = null, Color? inactiveColor = null, params GUILayoutOption[] options)
-				=> DrawToggle(string.IsNullOrEmpty(activeLabel) ? GUIContent.none : new GUIContent(activeLabel), string.IsNullOrEmpty(inactiveLabel) ? GUIContent.none : new GUIContent(inactiveLabel), style, activeColor, inactiveColor, options);
+			internal void DrawToggle(string activeLabel, string inactiveLabel = null, GUIStyle style = null, Color? activeColor = null, Color? inactiveColor = null, params GUILayoutOption[] options) =>
+				DrawToggle(
+					string.IsNullOrEmpty(activeLabel)
+						? GUIContent.none
+						: new GUIContent(activeLabel),
+					string.IsNullOrEmpty(inactiveLabel)
+						? GUIContent.none
+						: new GUIContent(inactiveLabel),
+					style,
+					activeColor,
+					inactiveColor,
+					options
+				);
 
 			internal void DrawToggle(GUIContent activeLabel, GUIContent inactiveLabel = null, GUIStyle style = null, Color? activeColor = null, Color? inactiveColor = null, params GUILayoutOption[] options)
 			{
-				activeColor = activeColor ?? GUI.backgroundColor;
-				inactiveColor = inactiveColor ?? GUI.backgroundColor;
+				activeColor ??= GUI.backgroundColor;
+				inactiveColor ??= GUI.backgroundColor;
 				Color ogColor = GUI.backgroundColor;
 				GUI.backgroundColor = value ? (Color) activeColor : (Color) inactiveColor;
 				value = GUILayout.Toggle(value, value || inactiveLabel == null ? activeLabel : inactiveLabel, style == null ? GUI.skin.button : style, options);
 				GUI.backgroundColor = ogColor;
 			}
 
-			internal bool DrawFoldout(string label) => DrawFoldout(new GUIContent(label));
+			internal bool DrawFoldout(string label) =>
+				DrawFoldout(new GUIContent(label));
 
-			internal bool DrawFoldout(GUIContent label)
-			{
-				return _value = EditorGUILayout.Foldout(_value, label);
-				;
-			}
+			internal bool DrawFoldout(GUIContent label) =>
+				_value = EditorGUILayout.Foldout(_value, label);
 
-			public static implicit operator bool(SavedBool s) => s._value;
-			internal override void Reset() => value = (bool) defaultValue;
+			public static implicit operator bool(SavedBool s) =>
+				s._value;
 
+			internal override void Reset() =>
+				value = (bool)defaultValue;
 		}
 
 		[Serializable]
 		internal class SavedFloat : SavedValue
 		{
-
 			[SerializeField] private float _value;
 			internal readonly Action OnChanged;
 
@@ -297,10 +299,14 @@ namespace OpenVRCTools.HierarchyPlus
 				OnChanged = OnChangedCallback;
 			}
 
-			internal override void Reset() => value = (float) defaultValue;
+			internal override void Reset() =>
+				value = (float) defaultValue;
 
-			public static implicit operator int(SavedFloat s) => (int) s._value;
-			public static implicit operator float(SavedFloat s) => s._value;
+			public static implicit operator int(SavedFloat s) =>
+				(int)s._value;
+
+			public static implicit operator float(SavedFloat s) =>
+				s._value;
 		}
 
 		[Serializable]
@@ -330,30 +336,30 @@ namespace OpenVRCTools.HierarchyPlus
 				OnChanged = OnChangedCallback;
 			}
 
-			internal override void Reset() => value = (string) defaultValue;
+			internal override void Reset() =>
+				value = (string) defaultValue;
 
-			public override string ToString() => value;
+			public override string ToString() =>
+				value;
 
-			public void DrawField(string label, GUIStyle style = null, params GUILayoutOption[] options) => DrawField(new GUIContent(label), style, options);
+			public void DrawField(string label, GUIStyle style = null, params GUILayoutOption[] options) =>
+				DrawField(new GUIContent(label), style, options);
 
-			public void DrawField(GUIContent label, GUIStyle style = null, params GUILayoutOption[] options)
-			{
+			public void DrawField(GUIContent label, GUIStyle style = null, params GUILayoutOption[] options) =>
 				value = EditorGUILayout.DelayedTextField(label, value);
-			}
 
-			public static implicit operator string(SavedString s) => s._value;
+			public static implicit operator string(SavedString s) =>
+				s._value;
 		}
 
 		[Serializable]
 		internal class SavedColor : SavedValue
 		{
 			internal readonly Action OnChanged;
-
 			[SerializeField] private float r;
 			[SerializeField] private float g;
 			[SerializeField] private float b;
 			[SerializeField] private float a;
-
 			internal Color color
 			{
 				get => new Color(r, g, b, a);
@@ -389,10 +395,8 @@ namespace OpenVRCTools.HierarchyPlus
 				OnChanged = OnChangedCallback;
 			}
 
-			internal void DrawField(string label, bool drawReset = true, params GUILayoutOption[] options)
-			{
+			internal void DrawField(string label, bool drawReset = true, params GUILayoutOption[] options) =>
 				DrawField(new GUIContent(label), drawReset, options);
-			}
 
 			internal void DrawField(GUIContent label, bool drawReset = true, params GUILayoutOption[] options)
 			{
@@ -400,15 +404,19 @@ namespace OpenVRCTools.HierarchyPlus
 				{
 					color = EditorGUILayout.ColorField(label, color, options);
 					if (!drawReset) return;
+
 					if (GUILayout.Button(Content.resetIcon, Styles.labelButton, GUILayout.Width(18), GUILayout.Height(18)))
 						Reset();
+
 					HierarchyPlus.MakeRectLinkCursor();
 				}
 			}
 
-			internal override void Reset() => color = (Color) defaultValue;
+			internal override void Reset() =>
+				color = (Color) defaultValue;
 
-			public static implicit operator Color(SavedColor s) => s.color;
+			public static implicit operator Color(SavedColor s) =>
+				s.color;
 		}
 
 
@@ -417,15 +425,12 @@ namespace OpenVRCTools.HierarchyPlus
 			internal object defaultValue;
 			internal abstract void Reset();
 		}
-
-
-
 		#endregion
 
 		#region Saved Data
 
 		[SerializeField] internal SavedString[]
-			hiddenIconTypes = {new SavedString("MeshFilter")};
+			hiddenIconTypes = { new SavedString("MeshFilter") };
 
 		[SerializeField] internal SavedColor
 			rowOddColor = new SavedColor(new Color(0.5f, 0.5f, 1, 0.07f)),
@@ -473,9 +478,13 @@ namespace OpenVRCTools.HierarchyPlus
 
 		#endregion
 
-		internal bool GetColorsEnabled() => enabled && colorsEnabled;
-		internal bool GetIconsEnabled() => enabled && iconsEnabled;
-		internal bool GetLabelsEnabled() => enabled && labelsEnabled;
-		internal bool GetRowColoringEnabled() => (rowColoringOddEnabled || rowColoringEvenEnabled);
+		internal bool GetColorsEnabled() =>
+			enabled && colorsEnabled;
+		internal bool GetIconsEnabled() =>
+			enabled && iconsEnabled;
+		internal bool GetLabelsEnabled() =>
+			enabled && labelsEnabled;
+		internal bool GetRowColoringEnabled() =>
+			rowColoringOddEnabled || rowColoringEvenEnabled;
 	}
 }

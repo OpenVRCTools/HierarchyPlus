@@ -54,10 +54,8 @@ namespace OpenVRCTools.HierarchyPlus
 
         #region Window
         [MenuItem("OpenVRCTools/HierarchyPlus", false, 366)]
-        private static void OpenSettings()
-		{
+        private static void OpenSettings() =>
 			GetWindow<HierarchyPlus>($"{PRODUCT_NAME} Settings");
-		}
 
 		private void OnGUI()
 		{
@@ -68,8 +66,10 @@ namespace OpenVRCTools.HierarchyPlus
 			{
 				settings.enabled.DrawField("HierarchyPlus Enabled");
 				GUILayout.FlexibleSpace();
-				if (GUILayout.Button(new GUIContent("Refresh Icons", "Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false))) 
+
+				if (GUILayout.Button(new GUIContent("Refresh Icons", "Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false)))
 					InitializeAll();
+
 				MakeRectLinkCursor();
 			}
 
@@ -102,23 +102,22 @@ namespace OpenVRCTools.HierarchyPlus
 								}
 							}
 
-
 						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
 						{
 							Foldout("Row Coloring", ref rowShadingFolout);
+
 							if (rowShadingFolout)
-							{
 								using (new IndentScope())
 								{
 									DrawColorSetting("Odd Color", settings.rowOddColor, settings.rowColoringOddEnabled);
 									DrawColorSetting("Even Color", settings.rowEvenColor, settings.rowColoringEvenEnabled);
 								}
-							}
 						}
 
 						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
 						{
 							Foldout("Misc", ref miscColorsFolddout);
+
 							if (miscColorsFolddout)
 								using (new IndentScope())
 								{
@@ -127,9 +126,7 @@ namespace OpenVRCTools.HierarchyPlus
 									DrawColorSetting("Misc 3", settings.colorThree, settings.colorThreeEnabled);
 								}
 						}
-
 					}
-
 				}
 			}
 
@@ -156,6 +153,7 @@ namespace OpenVRCTools.HierarchyPlus
 						using (new GUILayout.VerticalScope())
 						{
 							Foldout(new GUIContent("Hidden Types", "Hover over an icon to see its type name.\nWrite the type name here to hide the icon from the hierarchy view."), ref hiddenIconsFoldout);
+
 							if (hiddenIconsFoldout)
 							{
 								using (new IndentScope())
@@ -165,12 +163,13 @@ namespace OpenVRCTools.HierarchyPlus
 										using (new EditorGUILayout.HorizontalScope())
 										{
 											settings.hiddenIconTypes[i].DrawField(GUIContent.none);
+
 											if (GUILayout.Button("X", EditorStyles.boldLabel, GUILayout.ExpandWidth(false)))
 											{
 												var arr = settings.hiddenIconTypes;
 												ArrayUtility.RemoveAt(ref arr, i);
 												settings.hiddenIconTypes = arr;
-												SavedSettings.Save();
+                                                Save();
 												i--;
 											}
 
@@ -183,7 +182,7 @@ namespace OpenVRCTools.HierarchyPlus
 										var arr = settings.hiddenIconTypes;
 										ArrayUtility.Add(ref arr, new SavedString(""));
 										settings.hiddenIconTypes = arr;
-										SavedSettings.Save();
+										Save();
 									}
 
 									MakeRectLinkCursor();
@@ -209,6 +208,7 @@ namespace OpenVRCTools.HierarchyPlus
 						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
 						{
 							layerLabelFoldout = Foldout("Layer Label", ref layerLabelFoldout);
+
 							if (layerLabelFoldout)
 							{
 								using (new IndentScope())
@@ -224,6 +224,7 @@ namespace OpenVRCTools.HierarchyPlus
 						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
 						{
 							tagLabelFoldout = Foldout("Tag Label", ref tagLabelFoldout);
+
 							if (tagLabelFoldout)
 							{
 								using (new IndentScope())
@@ -240,9 +241,7 @@ namespace OpenVRCTools.HierarchyPlus
 
 			EditorGUILayout.EndScrollView();
 			using (new GUILayout.HorizontalScope())
-			{
 				GUILayout.FlexibleSpace();
-			}
 
 			if (EditorGUI.EndChangeCheck())
 				EditorApplication.RepaintHierarchyWindow();
@@ -250,15 +249,19 @@ namespace OpenVRCTools.HierarchyPlus
 
         internal static void w_UnderlineLastRectOnHover(Color? color = null)
         {
-	        if (color == null) color = new Color(0.3f, 0.7f, 1);
-	        if (Event.current.type == EventType.Repaint)
-	        {
-		        Rect rect = GUILayoutUtility.GetLastRect();
-		        Vector2 mp = Event.current.mousePosition;
-		        if (rect.Contains(mp)) EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1), color.Value);
-		        EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
-	        }
+	        if (color == null)
+				color = new Color(0.3f, 0.7f, 1);
 
+			if (Event.current.type == EventType.Repaint)
+			{
+				Rect rect = GUILayoutUtility.GetLastRect();
+				Vector2 mp = Event.current.mousePosition;
+
+				if (rect.Contains(mp))
+					EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1, rect.width, 1), color.Value);
+
+				EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
+			}
         }
         #endregion
 
@@ -277,12 +280,13 @@ namespace OpenVRCTools.HierarchyPlus
 	        }
 
 	        DisposeOfColorScopes();
-	        if (settings.GetColorsEnabled())
-	        {
-		        colorScope = new ColoredScope(ColoredScope.ColoringType.General, settings.colorOneEnabled, settings.colorOne);
-		        colorScope2 = new ColoredScope(ColoredScope.ColoringType.FG, settings.colorTwoEnabled, settings.colorTwo);
-		        colorScope3 = new ColoredScope(ColoredScope.ColoringType.BG, settings.colorThreeEnabled, settings.colorThree);
-	        }
+
+			if (settings.GetColorsEnabled())
+			{
+				colorScope = new ColoredScope(ColoredScope.ColoringType.General, settings.colorOneEnabled, settings.colorOne);
+				colorScope2 = new ColoredScope(ColoredScope.ColoringType.FG, settings.colorTwoEnabled, settings.colorTwo);
+				colorScope3 = new ColoredScope(ColoredScope.ColoringType.BG, settings.colorThreeEnabled, settings.colorThree);
+			}
 
 	        bool willDrawColors = settings.GetColorsEnabled() && (settings.guideLinesEnabled || settings.GetRowColoringEnabled());
 	        bool willDrawIcons = settings.GetIconsEnabled();
@@ -291,7 +295,6 @@ namespace OpenVRCTools.HierarchyPlus
 
 	        Object obj = EditorUtility.InstanceIDToObject(id);
 	        if (!(obj is GameObject go)) return;
-
 
 	        if (willDrawColors)
 	        {
@@ -331,9 +334,6 @@ namespace OpenVRCTools.HierarchyPlus
 			        Rect backgroundRect = new Rect(lineRect);
 			        backgroundRect.width += rect.width + marginWidth + 12;
 			        backgroundRect.x += 5;
-			        //backgroundRect.y += 16;
-
-
 
 			        if (backgroundRect.y % 32 > 15)
 			        {
@@ -342,15 +342,12 @@ namespace OpenVRCTools.HierarchyPlus
 			        }
 			        else if (settings.rowColoringEvenEnabled)
 				        EditorGUI.DrawRect(backgroundRect, settings.rowEvenColor);
-			        //GUI.depth = guiDepth;
 		        }
 
 		        if (hasParent && settings.guideLinesEnabled)
 		        {
 			        int extraWidth = hasChildren ? 0 : 12;
-
 			        void Line(Vector3 start, Vector3 end) => Handles.DrawAAPolyLine(1, 2, start, end);
-
 			        Handles.color = settings.guideLinesColor;
 
 			        GUI.BeginClip(lineRect);
@@ -407,46 +404,43 @@ namespace OpenVRCTools.HierarchyPlus
 
 			        availableIconArea.width -= 18;
 			        return drawIcon;
-
 		        }
 
 		        if (settings.showGameObjectIcon && CanDrawIcon(out bool withBg))
 			        iconRect = DrawIconToggle(iconRect, go, withBg);
 
 		        bool isFirstComponent = true;
+
 		        foreach (var c in go.GetComponents<Component>())
-		        {
-			        if (c != null)
-			        {
-				        if (!isFirstComponent && !settings.showNonBehaviourIcons)
-					        if (!(c is Behaviour) && !(c is Renderer) && !(c is Collider))
-						        continue;
+				{
+					if (c != null)
+					{
+						if (!isFirstComponent && !settings.showNonBehaviourIcons)
+							if (c is not Behaviour && c is not Renderer && c is not Collider) continue;
 
-				        if (isFirstComponent)
-				        {
-					        isFirstComponent = false;
-					        if (!settings.showTransformIcon)
-						        continue;
-				        }
+						if (isFirstComponent)
+						{
+							isFirstComponent = false;
+							if (!settings.showTransformIcon) continue;
+						}
 
+						if (!isFirstComponent && settings.hiddenIconTypes.Any(ss => ss.value == c.GetType().Name)) continue;
+					}
 
+					if (CanDrawIcon(out bool withBg2))
+					{
+						Rect nextRect = iconRect;
+						iconRect = DrawIconToggle(iconRect, c, withBg2);
+						Event e = Event.current;
 
-				        if (!isFirstComponent && settings.hiddenIconTypes.Any(ss => ss.value == c.GetType().Name)) continue;
-			        }
-
-			        if (CanDrawIcon(out bool withBg2))
-			        {
-				        Rect nextRect = iconRect;
-				        iconRect = DrawIconToggle(iconRect, c, withBg2);
-				        Event e = Event.current;
-				        if (settings.enableContextClick && e.type == EventType.MouseDown && e.button == 1 && nextRect.Contains(e.mousePosition))
-				        {
-					        var method = typeof(EditorUtility).GetMethod("DisplayObjectContextMenu", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] {typeof(Rect), typeof(Object[]), typeof(int)}, null);
-					        method.Invoke(null, new object[] {nextRect, new Object[] {c == null ? c as MonoBehaviour : c}, 0});
-					        e.Use();
-				        }
-			        }
-		        }
+						if (settings.enableContextClick && e.type == EventType.MouseDown && e.button == 1 && nextRect.Contains(e.mousePosition))
+						{
+							var method = typeof(EditorUtility).GetMethod("DisplayObjectContextMenu", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(Rect), typeof(Object[]), typeof(int) }, null);
+							method.Invoke(null, new object[] { nextRect, new Object[] { c == null ? c as MonoBehaviour : c }, 0 });
+							e.Use();
+						}
+					}
+				}
 
 		        if (currentIconCount > maxIconCount) maxIconCount = currentIconCount;
 	        }
@@ -464,40 +458,42 @@ namespace OpenVRCTools.HierarchyPlus
 			        Rect layerRect = UseRectEnd(ref availableLabelsArea, layerLabelWidth);
 			        layerRect.width = Mathf.Clamp(layerRect.width, 0, Mathf.Max(0, maxWidth));
 			        layerRect.x += layerLabelWidth - layerRect.width;
-			        if (layerRect.width > 10)
-			        {
-				        string layerName = LayerMask.LayerToName(go.layer);
-				        string label = settings.displayLayerIndex ? $"{go.layer}: {layerName}" : layerName;
-				        using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
-				        using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
-					        GUI.Label(layerRect, label, als);
 
-				        if (settings.enableLabelContextClick && RightClicked(layerRect))
-				        {
-					        var layerNames = Enumerable.Range(0, 31).Select(LayerMask.LayerToName).ToArray();
+					if (layerRect.width > 10)
+					{
+						string layerName = LayerMask.LayerToName(go.layer);
+						string label = settings.displayLayerIndex ? $"{go.layer}: {layerName}" : layerName;
+						using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
+						using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
+							GUI.Label(layerRect, label, als);
 
-					        GenericMenu layerMenu = new GenericMenu();
-					        for (int i = 0; i < layerNames.Length; i++)
-					        {
-						        var n = layerNames[i];
-						        if (!string.IsNullOrEmpty(n))
-						        {
-							        int index = i;
-							        layerMenu.AddItem(new GUIContent($"{i}: {n}"), go.layer == index, () =>
-							        {
-								        Undo.RecordObject(go, "Change Layer");
-								        go.layer = index;
-								        EditorUtility.SetDirty(go);
-							        });
-						        }
-					        }
+						if (settings.enableLabelContextClick && RightClicked(layerRect))
+						{
+							var layerNames = Enumerable.Range(0, 31).Select(LayerMask.LayerToName).ToArray();
+							GenericMenu layerMenu = new GenericMenu();
 
-					        layerMenu.ShowAsContext();
-				        }
-			        }
+							for (int i = 0; i < layerNames.Length; i++)
+							{
+								var n = layerNames[i];
+
+								if (!string.IsNullOrEmpty(n))
+								{
+									int index = i;
+									layerMenu.AddItem(new GUIContent($"{i}: {n}"), go.layer == index, () =>
+									{
+										Undo.RecordObject(go, "Change Layer");
+										go.layer = index;
+										EditorUtility.SetDirty(go);
+									});
+								}
+							}
+
+							layerMenu.ShowAsContext();
+						}
+					}
 		        }
 		        else UseRectEnd(ref availableLabelsArea, settings.layerLabelWidth);
-		        
+
 		        if (settings.tagLabelEnabled && (settings.displayUntaggedLabel || !go.CompareTag("Untagged")))
 		        {
 			        UseRectEnd(ref availableLabelsArea, 18);
@@ -505,33 +501,34 @@ namespace OpenVRCTools.HierarchyPlus
 			        float labelWidth = settings.tagLabelWidth;
 			        Rect tagRect = UseRectEnd(ref availableLabelsArea, labelWidth);
 			        tagRect.width = Mathf.Clamp(tagRect.width, 0, Mathf.Max(0, maxWidth));
-			        if (tagRect.width > 10)
-			        {
-				        tagRect.x += labelWidth - tagRect.width;
-				        string tagName = go.tag;
-				        using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
-				        using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
-					        GUI.Label(tagRect, tagName, "assetlabel");
 
-				        if (settings.enableLabelContextClick && RightClicked(tagRect))
-				        {
-					        var tagNames = UnityEditorInternal.InternalEditorUtility.tags;
+					if (tagRect.width > 10)
+					{
+						tagRect.x += labelWidth - tagRect.width;
+						string tagName = go.tag;
+						using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
+						using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
+							GUI.Label(tagRect, tagName, "assetlabel");
 
-					        GenericMenu tagMenu = new GenericMenu();
-					        foreach (var n in tagNames)
-					        {
-						        if (string.IsNullOrEmpty(n)) continue;
-						        tagMenu.AddItem(new GUIContent(n), go.CompareTag(n), () =>
-						        {
-							        Undo.RecordObject(go, "Change Tag");
-							        go.tag = n;
-							        EditorUtility.SetDirty(go);
-						        });
-					        }
+						if (settings.enableLabelContextClick && RightClicked(tagRect))
+						{
+							var tagNames = UnityEditorInternal.InternalEditorUtility.tags;
+							GenericMenu tagMenu = new GenericMenu();
 
-					        tagMenu.ShowAsContext();
-				        }
-			        }
+							foreach (var n in tagNames)
+							{
+								if (string.IsNullOrEmpty(n)) continue;
+								tagMenu.AddItem(new GUIContent(n), go.CompareTag(n), () =>
+								{
+									Undo.RecordObject(go, "Change Tag");
+									go.tag = n;
+									EditorUtility.SetDirty(go);
+								});
+							}
+
+							tagMenu.ShowAsContext();
+						}
+					}
 		        }
 	        }
         }
@@ -545,7 +542,6 @@ namespace OpenVRCTools.HierarchyPlus
         #endregion
 
         #region Drawing Helpers
-
         internal static Rect UseRectEnd(ref Rect rect, float width)
         {
 	        var returnRect = rect;
@@ -554,22 +550,23 @@ namespace OpenVRCTools.HierarchyPlus
 	        returnRect.width = width;
 	        return returnRect;
         }
-        
+
         internal static void MakeRectLinkCursor(Rect rect = default)
         {
 	        if (Event.current.type == EventType.Repaint)
 	        {
-		        if (rect == default) rect = GUILayoutUtility.GetLastRect();
+		        if (rect == default)
+					rect = GUILayoutUtility.GetLastRect();
+
 		        EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
 	        }
         }
 
-        private static bool Foldout(GUIContent label, ref bool b)
-        {
-	        return b = EditorGUILayout.Foldout(b, label, true);
-        }
+        private static bool Foldout(GUIContent label, ref bool b) =>
+			b = EditorGUILayout.Foldout(b, label, true);
 
-        private static bool Foldout(string label, ref bool b) => Foldout(new GUIContent(label), ref b);
+        private static bool Foldout(string label, ref bool b) =>
+			Foldout(new GUIContent(label), ref b);
 
         private static bool DrawFoldoutTitle(string label, bool foldout, SavedBool enabled)
         {
@@ -584,7 +581,9 @@ namespace OpenVRCTools.HierarchyPlus
 			        MakeRectLinkCursor();
 		        }
 
-		        if (LeftClicked(r)) foldout = !foldout;
+		        if (LeftClicked(r))
+					foldout = !foldout;
+
 		        MakeRectLinkCursor(r);
 	        }
 
@@ -602,7 +601,7 @@ namespace OpenVRCTools.HierarchyPlus
 			        EditorGUIUtility.AddCursorRect(r, MouseCursor.Link);
 		        } else using (new EditorGUI.DisabledScope(true))
 			        GUILayout.Toggle(true, " ", EditorStyles.radioButton, GUILayout.Width(18), GUILayout.Height(18));
-		        
+
 		        EditorGUILayout.PrefixLabel(label);
 		        color.DrawField(GUIContent.none);
 	        }
@@ -612,14 +611,17 @@ namespace OpenVRCTools.HierarchyPlus
         {
 	        bool newState = !go.activeSelf;
 	        bool leftClicked = LeftClicked(rect);
+
 	        if (leftClicked || MouseDraggedOver(rect, go))
-	        {
-		        if (leftClicked) StartDragToggling(newState);
-		        Undo.RecordObject(go, "[H+] Toggle GameObject");
-		        go.SetActive(dragToggleNewState);
-		        EditorUtility.SetDirty(go);
-		        dragToggledObjects.Add(go);
-	        }
+			{
+				if (leftClicked)
+					StartDragToggling(newState);
+
+				Undo.RecordObject(go, "[H+] Toggle GameObject");
+				go.SetActive(dragToggleNewState);
+				EditorUtility.SetDirty(go);
+				dragToggledObjects.Add(go);
+			}
 
 	        return DrawIcon(rect, go, newState, withBackground);
         }
@@ -628,40 +630,49 @@ namespace OpenVRCTools.HierarchyPlus
         {
 	        bool newState = !IsComponentEnabled(c);
 	        if (!IsComponentToggleable(c)) return DrawIcon(rect, c, newState, withBackgroun);
-	        
+
 	        bool leftClicked = LeftClicked(rect);
+
 	        if (leftClicked || MouseDraggedOver(rect, c))
-	        {
-		        if (leftClicked) StartDragToggling(newState);
-		        Undo.RecordObject(c, "[H+] Toggle Component");
-		        SetComponentEnabled(c, dragToggleNewState);
-		        EditorUtility.SetDirty(c);
-		        dragToggledObjects.Add(c);
-	        }
+			{
+				if (leftClicked) StartDragToggling(newState);
+				Undo.RecordObject(c, "[H+] Toggle Component");
+				SetComponentEnabled(c, dragToggleNewState);
+				EditorUtility.SetDirty(c);
+				dragToggledObjects.Add(c);
+			}
 
 	        return DrawIcon(rect, c, newState, withBackgroun);
         }
-        private static Rect DrawIcon(Rect rect, Component c, bool faded, bool withBackground) => DrawIcon(GetIcon(c), rect, faded, withBackground);
+        private static Rect DrawIcon(Rect rect, Component c, bool faded, bool withBackground) =>
+			DrawIcon(GetIcon(c), rect, faded, withBackground);
 
         private static Rect DrawIcon(Rect rect, GameObject go, bool faded, bool withBackground)
         {
 	        GUIContent goContent = gameObjectContent;
+
 	        if (settings.useCustomGameObjectIcon && GetGameObjectIconMethod != null)
-	        {
-		        Texture2D icon = GetGameObjectIconMethod.Invoke(null, new object[] { go }) as Texture2D;
-		        if (icon != null) goContent = new GUIContent(goContent){image = icon};
-	        }
+			{
+				Texture2D icon = GetGameObjectIconMethod.Invoke(null, new object[] { go }) as Texture2D;
+
+				if (icon != null)
+					goContent = new GUIContent(goContent) { image = icon };
+			}
+
 	        return DrawIcon(goContent, rect, faded, withBackground);
         }
-        
+
         private static Rect DrawIcon(GUIContent content, Rect rect, bool faded, bool withBackground)
         {
 	        using (new ColoredScope(ColoredScope.ColoringType.All, faded, settings.iconFadedTintColor, settings.iconTintColor))
 	        {
-		        if (withBackground) EditorGUI.DrawRect(rect, settings.iconBackgroundColor);
-		        GUI.Label(rect, content);
-		        if (settings.linkCursorOnHover)
-			        MakeRectLinkCursor(rect);
+		        if (withBackground)
+					EditorGUI.DrawRect(rect, settings.iconBackgroundColor);
+
+				GUI.Label(rect, content);
+
+				if (settings.linkCursorOnHover)
+					MakeRectLinkCursor(rect);
 	        }
             rect.x -= 18;
             return rect;
@@ -673,20 +684,20 @@ namespace OpenVRCTools.HierarchyPlus
             Type type = c.GetType();
             if (customIconCache.TryGetValue(type.Name, out var contentIcon)) return contentIcon;
             if (iconCache.TryGetValue(type, out contentIcon)) return contentIcon;
-            
-            
+
             Texture2D icon = AssetPreview.GetMiniThumbnail(c);
-            if (!icon || defaultTextures.Any(t => icon == t))
-            {
-                defaultContent.tooltip = type.Name;
-                return defaultContent;
-            }
+
+			if (!icon || defaultTextures.Any(t => icon == t))
+			{
+				defaultContent.tooltip = type.Name;
+				return defaultContent;
+			}
 
 	        contentIcon = new GUIContent(icon, type.Name);
             iconCache.Add(type, contentIcon);
             return contentIcon;
         }
-        
+
         internal static Texture2D GenerateColorTexture(float r, float g, float b, float a = 1)
         {
 	        if (r > 1) r /= 255;
@@ -698,7 +709,7 @@ namespace OpenVRCTools.HierarchyPlus
         }
 
         private static Texture2D _temporaryTexture;
-        
+
         internal static Texture2D GenerateColorTexture(Color color)
         {
 	        if (_temporaryTexture == null)
@@ -707,13 +718,13 @@ namespace OpenVRCTools.HierarchyPlus
 		        _temporaryTexture.anisoLevel = 0;
 		        _temporaryTexture.filterMode = FilterMode.Point;
 	        }
-	        
+
 	        _temporaryTexture.SetPixel(0, 0, color);
 	        _temporaryTexture.Apply();
 	        return _temporaryTexture;
         }
         #endregion
-        
+
         #region Functional Helpers
         private static bool IsComponentToggleable(Component c) => c is Behaviour || c is Renderer || c is Collider;
 
@@ -731,32 +742,43 @@ namespace OpenVRCTools.HierarchyPlus
 	        d.enabled = enabled;
         }
 
-        private static int GetDepth(GameObject go) => GetDepth(go.transform);
-        private static int GetDepth(Transform t)
-        {
-	        int depth = 0;
-	        while (t.parent != null)
-	        {
-		        depth++;
-		        t = t.parent;
-	        }
+        private static int GetDepth(GameObject go) =>
+			GetDepth(go.transform);
 
-	        return depth;
-        }
+        private static int GetDepth(Transform t)
+		{
+			int depth = 0;
+
+			while (t.parent != null)
+			{
+				depth++;
+				t = t.parent;
+			}
+
+			return depth;
+		}
+
         private static bool LeftClicked(Rect rect)
-        {
-            var e = Event.current;
-            bool clicked = e.type == EventType.MouseDown && e.button == 0 && rect.Contains(e.mousePosition);
-            if (clicked) e.Use();
-            return clicked;
-        }
+		{
+			var e = Event.current;
+			bool clicked = e.type == EventType.MouseDown && e.button == 0 && rect.Contains(e.mousePosition);
+
+			if (clicked)
+				e.Use();
+
+			return clicked;
+		}
+
         private static bool RightClicked(Rect rect)
-        {
-            var e = Event.current;
-            bool clicked = e.type == EventType.MouseDown && e.button == 1 && rect.Contains(e.mousePosition);
-            if (clicked) e.Use();
-            return clicked;
-        }
+		{
+			var e = Event.current;
+			bool clicked = e.type == EventType.MouseDown && e.button == 1 && rect.Contains(e.mousePosition);
+
+			if (clicked)
+				e.Use();
+
+			return clicked;
+		}
 
         private static bool MouseDraggedOver(Rect rect, Object o)
         {
@@ -768,14 +790,13 @@ namespace OpenVRCTools.HierarchyPlus
         {
 	        dragToggledObjects.Clear();
 	        dragToggleNewState = toggleToState;
-	        if (settings.enableDragToggle) 
-		        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
+
+	        if (settings.enableDragToggle)
+				GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
         }
         #endregion
 
         #region Initialization
-
-
         [InitializeOnLoadMethod]
         private static void InitializeGUI()
         {
@@ -785,8 +806,9 @@ namespace OpenVRCTools.HierarchyPlus
             EditorApplication.update -= OnCustomUpdate;
             EditorApplication.update += OnCustomUpdate;
         }
-        
-        private static void OnCustomUpdate() { ranOnceThisFrame = false; }
+
+        private static void OnCustomUpdate() =>
+			ranOnceThisFrame = false;
 
         private static void InitializeAll()
         {
@@ -801,52 +823,59 @@ namespace OpenVRCTools.HierarchyPlus
             iconFolderPath = string.Empty;
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(assembly);
-            if (packageInfo != null)
-            {
-                var packagePath = packageInfo.assetPath;
-                iconFolderPath = $"{packagePath}/{PACKAGE_ICON_FOLDER_PATH}";
-                
-                if (!AssetDatabase.IsValidFolder(iconFolderPath))
-                {
-                    CustomLog($"Custom Icon folder couldn't be found in {iconFolderPath}. Custom Icons are disabled.");
-                    iconFolderPath = string.Empty;
-                }
-            } else CustomLog("Couldn't get package info for HierarchyPlus. Custom Icons are disabled. Is the script in Packages?", CustomLogType.Warning);
+
+			if (packageInfo != null)
+			{
+				var packagePath = packageInfo.assetPath;
+				iconFolderPath = $"{packagePath}/{PACKAGE_ICON_FOLDER_PATH}";
+
+				if (!AssetDatabase.IsValidFolder(iconFolderPath))
+				{
+					CustomLog($"Custom Icon folder couldn't be found in {iconFolderPath}. Custom Icons are disabled.");
+					iconFolderPath = string.Empty;
+				}
+			}
+			else CustomLog("Couldn't get package info for HierarchyPlus. Custom Icons are disabled. Is the script in Packages?", CustomLogType.Warning);
         }
-        
+
         private static void InitializeSpecialIcons()
         {
 	        GetGameObjectIconMethod = typeof(EditorGUIUtility).GetMethod("GetIconForObject", BindingFlags.NonPublic | BindingFlags.Static );
-	        if (GetGameObjectIconMethod == null)
-		        GetGameObjectIconMethod = typeof(EditorGUIUtility).GetMethod("GetIconForObject", BindingFlags.Public | BindingFlags.Static );
-	        
+
+			if (GetGameObjectIconMethod == null)
+				GetGameObjectIconMethod = typeof(EditorGUIUtility).GetMethod("GetIconForObject", BindingFlags.Public | BindingFlags.Static);
+
 	        defaultTextures[0] = EditorGUIUtility.IconContent("cs Script Icon")?.image as Texture2D;
 	        defaultTextures[1] = EditorGUIUtility.IconContent("d_cs Script Icon")?.image as Texture2D;
 	        defaultTextures[2] = EditorGUIUtility.IconContent("dll Script Icon")?.image as Texture2D;
 
 	        if (!customIconCache.TryGetValue("GameObject", out gameObjectContent))
                 gameObjectContent = new GUIContent(AssetPreview.GetMiniTypeThumbnail(typeof(GameObject)));
-	        gameObjectContent.tooltip = "GameObject";
-            
+
+			gameObjectContent.tooltip = "GameObject";
+
             if (!customIconCache.TryGetValue(DEFAULT_ICON_NAME, out defaultContent))
                 defaultContent = new GUIContent(AssetPreview.GetMiniTypeThumbnail(typeof(MonoScript)));
-            
+
             string missingTooltip = "Missing Script";
-            if (customIconCache.TryGetValue(MISSING_SCRIPT_ICON_NAME, out var value))
-                missingScriptContent = new GUIContent(value){tooltip = missingTooltip};
-            else missingScriptContent = new GUIContent(defaultContent){tooltip = missingTooltip};
+
+			missingScriptContent = customIconCache.TryGetValue(MISSING_SCRIPT_ICON_NAME, out var value)
+				? new GUIContent(value) { tooltip = missingTooltip }
+				: new GUIContent(defaultContent) { tooltip = missingTooltip };
         }
         private static void InitializeCustomIcons()
-        {            
+        {
             customIconCache.Clear();
             if (string.IsNullOrWhiteSpace(iconFolderPath)) return;
             var paths = Directory.GetFiles(iconFolderPath, "*", SearchOption.AllDirectories).Where(p => !p.EndsWith(".meta"));
-            foreach (var p in paths)
-            {
-	            Texture2D icon = AssetDatabase.LoadAssetAtPath<Texture2D>(p);
-                if (icon != null) customIconCache.Add(icon.name, new GUIContent(icon, icon.name));
-            }
-            
+
+			foreach (var p in paths)
+			{
+				Texture2D icon = AssetDatabase.LoadAssetAtPath<Texture2D>(p);
+
+				if (icon != null)
+					customIconCache.Add(icon.name, new GUIContent(icon, icon.name));
+			}
         }
         #endregion
 
@@ -863,18 +892,20 @@ namespace OpenVRCTools.HierarchyPlus
             {
                 Color finalColor = type == CustomLogType.Regular ? pastelGreenColor : type == CustomLogType.Warning ? pastelYellowColor : pastelRedColor;
                 string fullMessage = $"<color=#{ColorUtility.ToHtmlStringRGB(finalColor)}>[{PRODUCT_NAME}]</color> {message.Replace("\\n", "\n")}";
-                switch (type)
-                {
-                    case CustomLogType.Regular:
-                        Debug.Log(fullMessage); break;
-                    case CustomLogType.Warning:
-                        Debug.LogWarning(fullMessage); break;
-                    case CustomLogType.Error:
-                        Debug.LogError(fullMessage); break;
-                }
+
+				switch (type)
+				{
+					case CustomLogType.Regular:
+						Debug.Log(fullMessage); break;
+					case CustomLogType.Warning:
+						Debug.LogWarning(fullMessage); break;
+					case CustomLogType.Error:
+						Debug.LogError(fullMessage); break;
+				}
 
             }
-            return condition;
+
+			return condition;
         }
         internal enum CustomLogType
         {

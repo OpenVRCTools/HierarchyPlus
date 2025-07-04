@@ -48,8 +48,9 @@ namespace OpenVRCTools.HierarchyPlus
 		internal ColoredScope(ColoringType type, bool isActive, Color color)
 		{
 			coloringType = type;
-			if (isActive) SetColors(color);
 
+			if (isActive)
+				SetColors(color);
 		}
 
 		internal ColoredScope(ColoringType type, bool isActive, Color active, Color inactive)
@@ -61,6 +62,7 @@ namespace OpenVRCTools.HierarchyPlus
 		internal ColoredScope(ColoringType type, int selectedIndex, params Color[] colors)
 		{
 			coloringType = type;
+
 			if (selectedIndex >= 0)
 			{
 				MemorizeColor();
@@ -74,12 +76,12 @@ namespace OpenVRCTools.HierarchyPlus
 
 			if (coloringType.HasFlag(ColoringType.BG))
 				GUI.backgroundColor = ogColors[0];
+
 			if (coloringType.HasFlag(ColoringType.FG))
 				GUI.contentColor = ogColors[1];
+
 			if (coloringType.HasFlag(ColoringType.General))
 				GUI.color = ogColors[2];
-
-
 		}
 	}
 }

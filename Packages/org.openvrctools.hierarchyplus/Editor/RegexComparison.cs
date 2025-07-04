@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +11,8 @@ namespace OpenVRCTools.HierarchyPlus
 	[Serializable]
 	internal class RegexComparison
 	{
-		internal readonly GUIContent fontIcon = new GUIContent(EditorGUIUtility.IconContent("Font Icon")) {tooltip = "Case Sensitive"};
-		internal readonly GUIContent regexIcon = new GUIContent(EditorGUIUtility.IconContent("d_PreTexR@2x")) {tooltip = "Regex Mode"};
+		internal readonly GUIContent fontIcon = new GUIContent(EditorGUIUtility.IconContent("Font Icon")) { tooltip = "Case Sensitive" };
+		internal readonly GUIContent regexIcon = new GUIContent(EditorGUIUtility.IconContent("d_PreTexR@2x")) { tooltip = "Regex Mode" };
 
 		[SerializeField] internal ComparisonType _comparisonType = ComparisonType.Contains;
 		[SerializeField] internal bool caseSensitive;
@@ -50,6 +49,7 @@ namespace OpenVRCTools.HierarchyPlus
 			if (string.IsNullOrEmpty(comparisonPattern)) return results;
 
 			string pattern = GetFinalPattern();
+
 			for (int i = 0; i < enumerable.Length; i++)
 				results[i] = Regex.IsMatch(enumerable[i], pattern);
 
@@ -59,7 +59,6 @@ namespace OpenVRCTools.HierarchyPlus
 		internal string GetFinalPattern()
 		{
 			if (comparisonType == ComparisonType.Regex) return comparisonPattern;
-
 			StringBuilder finalPattern = new StringBuilder();
 			if (((int) comparisonType & 1) > 0) finalPattern.Append('^');
 			if (!caseSensitive) finalPattern.Append("(?i)");
@@ -68,7 +67,8 @@ namespace OpenVRCTools.HierarchyPlus
 			return finalPattern.ToString();
 		}
 
-		internal bool isValid => !string.IsNullOrEmpty(comparisonPattern) && IsValidRegex(GetFinalPattern());
+		internal bool isValid =>
+			!string.IsNullOrEmpty(comparisonPattern) && IsValidRegex(GetFinalPattern());
 
 		internal static bool IsValidRegex(string pattern)
 		{
@@ -90,15 +90,25 @@ namespace OpenVRCTools.HierarchyPlus
 		{
 			bool starts = comparisonPattern.StartsWith("^");
 			bool ends = comparisonPattern.EndsWith("$");
-			if (starts && ends) _comparisonType = ComparisonType.EqualsTo;
-			else if (starts) _comparisonType = ComparisonType.StartsWith;
-			else if (ends) _comparisonType = ComparisonType.EndsWith;
-			else _comparisonType = ComparisonType.Contains;
-			if (starts) comparisonPattern = comparisonPattern.Substring(1);
-			if (ends) comparisonPattern = comparisonPattern.Substring(0, comparisonPattern.Length - 1);
+
+			if (starts && ends)
+				_comparisonType = ComparisonType.EqualsTo;
+			else if (starts)
+				_comparisonType = ComparisonType.StartsWith;
+			else if (ends)
+				_comparisonType = ComparisonType.EndsWith;
+			else
+				_comparisonType = ComparisonType.Contains;
+
+			if (starts)
+				comparisonPattern = comparisonPattern.Substring(1);
+
+			if (ends)
+				comparisonPattern = comparisonPattern.Substring(0, comparisonPattern.Length - 1);
 
 			var temp = comparisonPattern;
 			comparisonPattern = comparisonPattern.Replace("(?i)", "");
+
 			if (temp == comparisonPattern)
 				caseSensitive = true;
 		}
